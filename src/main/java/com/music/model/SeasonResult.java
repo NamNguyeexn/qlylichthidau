@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "seasonResult")
+@Table(name = "season_result")
 public class SeasonResult {
 	@Id
 	@Column(name = "id", nullable = false)

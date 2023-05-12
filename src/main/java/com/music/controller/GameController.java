@@ -5,14 +5,18 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.model.Game;
+import com.music.model.RaceStage;
 import com.music.model.ResponseObject;
 import com.music.service.impl.GameService;
 
@@ -22,15 +26,21 @@ import com.music.service.impl.GameService;
 public class GameController {
 	@Autowired
 	private GameService gameService;
-	@PostMapping()
-	public ResponseEntity<ResponseObject<Object>> createGame(@RequestBody Game game){
+	@PostMapping("/create")
+	public ResponseEntity<ResponseObject<Game>> createGame(@RequestBody Game game){
 		return ResponseEntity.ok().body(gameService.createGame(game));
 	}
-	@GetMapping("/delete/{id}")
+	@PutMapping("/update/{id}")
+	public ResponseEntity<ResponseObject<Game>> updateGame(
+			@RequestBody Game gameU, 
+			@PathVariable int id){
+		return ResponseEntity.ok().body(gameService.updateById(id, gameU));
+	}
+	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<ResponseObject<Object>> deleteById(@PathVariable("id") int gameId){
 		return ResponseEntity.ok().body(gameService.deleteById(gameId));
 	}
-	@GetMapping("")
+	@GetMapping()
 	public ResponseEntity<ResponseObject<List<Game>>> getAll() {
 		return ResponseEntity.ok().body(gameService.getAll());
 	}
@@ -46,4 +56,5 @@ public class GameController {
 	public ResponseEntity<ResponseObject<List<Game>>> findByRiderId(@PathVariable("id") int riderId){
 		return ResponseEntity.ok().body(gameService.findByRiderId(riderId));
 	}
+
 }

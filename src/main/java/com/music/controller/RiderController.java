@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +23,7 @@ import com.music.service.impl.RiderService;
 public class RiderController {
 	@Autowired
 	private RiderService riderService;
-	@PostMapping()
-	public ResponseEntity<ResponseObject<Object>> createRider(@RequestBody Rider rider){
-		return ResponseEntity.ok().body(riderService.createRider(rider));
-	}
-	@GetMapping("/delete/{id}")
-	public ResponseEntity<ResponseObject<Object>> deleteById(@PathVariable("id") int riderId){
-		return ResponseEntity.ok().body(riderService.deleteById(riderId));
-	}
-	@GetMapping("")
+	@GetMapping("/all")
 	public ResponseEntity<ResponseObject<ArrayList<Rider>>> getAll() {
 		return ResponseEntity.ok().body(riderService.findAll());
 	}
@@ -42,8 +35,4 @@ public class RiderController {
 	public ResponseEntity<ResponseObject<ArrayList<Rider>>> findByTeamId(@PathVariable("id") int teamId){
 		return ResponseEntity.ok().body(riderService.findRiderByTeamId(teamId));
 	}
-//	@GetMapping("/find/byRider/{id}")
-//	public ResponseEntity<ResponseObject<List<Game>>> findByRiderId(@PathVariable("id") int riderId){
-//		return ResponseEntity.ok().body(gameService.findByRiderId(riderId));
-//	}
 }

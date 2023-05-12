@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.music.model.Game;
 import com.music.model.ResponseObject;
+import com.music.model.Rider;
 import com.music.model.SeasonResult;
 import com.music.model.User;
 import com.music.repository.GameRepo;
+import com.music.repository.RiderRepo;
 import com.music.repository.SeasonResultRepo;
 import com.music.repository.UserRepo;
 import com.music.service.IGameService;
@@ -24,6 +26,8 @@ public class GameService implements IGameService{
 	private UserRepo userRepo;
 	@Autowired
 	private SeasonResultRepo seasonResultRepo;
+	@Autowired
+	private RiderRepo riderRepo;
 	@Override
 	public ResponseObject<List<Game>> findByRiderId(int riderId) {
 		try {
@@ -33,7 +37,7 @@ public class GameService implements IGameService{
 			}
 			List<Game> res = new ArrayList<>();
 			for (var g : gameRepo.findAll()) {
-				if (g.getRider().getId() == riderId) {
+				if (g.getRiderId() == riderId) {
 					res.add(g);
 				}
 			}
@@ -42,20 +46,20 @@ public class GameService implements IGameService{
 			}
 			return new ResponseObject<List<Game>>("Lay danh sach lich thi dau cua tay dua thanh cong", res);
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<List<Game>>(e.getMessage(), null);
 		}
 	}
 	@Override
 	public ResponseObject<Object> deleteById(int gameId) {
 		try {
-			Optional<Game> _game = Optional.of(gameRepo.findById(gameId));
+			Optional<Game> _game = Optional.ofNullable(gameRepo.findById(gameId));
 			if(!_game.isPresent()) {
 				return new ResponseObject<Object>("Khong tim thay lich thi dau hop le", null);
 			}
 			gameRepo.deleteById(gameId);
 			return new ResponseObject<Object>("Xoa thanh cong lich thi dau", null);
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<Object>(e.getMessage(), null);
 		}
 	}
 	@Override
@@ -67,49 +71,37 @@ public class GameService implements IGameService{
 			}
 			return new ResponseObject<List<Game>>("Lay danh sach lich thi dau thanh cong", _games.get());
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<List<Game>>(e.getMessage(), null);
 		}
 	}
 	@Override
 	public ResponseObject<Game> findById(int gameId) {
 		try {
-			Optional<Game> _game = Optional.of(gameRepo.findById(gameId));
+			Optional<Game> _game = Optional.ofNullable(gameRepo.findById(gameId));
 			if(!_game.isPresent()) {
 				return new ResponseObject<Game>("Khong tim thay lich thi dau hop le", null);
 			}
 			return new ResponseObject<Game>("Lay lich thi dau thanh cong", _game.get());
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<Game>(e.getMessage(), null);
 		}
 	}
 	@Override
 	public ResponseObject<Game> findBySeasonResultId(int seasonResultId) {
 		try {
-			Optional<SeasonResult> _seasonResult = Optional.of(seasonResultRepo.findById(seasonResultId));
+			Optional<SeasonResult> _seasonResult = Optional.ofNullable(seasonResultRepo.findById(seasonResultId));
 			if(!_seasonResult.isPresent()) {
 				return new ResponseObject<Game>("Ma lich ket qua khong hop le", null);
 			}
-			Optional<Game> _game = Optional.of(gameRepo.findBySeasonResultId(_seasonResult.get().getId()));
+			Optional<Game> _game = Optional.ofNullable(gameRepo.findBySeasonResultId(_seasonResult.get().getId()));
 			if(!_game.isPresent()) {
 				return new ResponseObject<Game>("Khong tim thay lich thi dau hop le", null);
 			}
 			return new ResponseObject<Game>("Lay lich thi dau thanh cong", _game.get());
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<Game>(e.getMessage(), null);
 		}
 	}
-//	@Override
-//	public ResponseObject<ArrayList<Game>> findBySeasonId(int seasonId) {
-//		try {
-//			Optional<ArrayList<Game>> _games = Optional.of(gameRepo.findBySeasonId(seasonId));
-//			if(!_games.isPresent()) {
-//				return new ResponseObject<ArrayList<Game>>("Khong tim thay lich thi dau hop le", null);
-//			}
-//			return new ResponseObject<ArrayList<Game>>("Lay danh sach lich thi dau thanh cong", _games.get());
-//		} catch (Exception e) {
-//			throw e;
-//		}
-//	}
 	@Override
 	public ResponseObject<List<Game>> findByUserId(int userId) {
 		try {
@@ -123,31 +115,53 @@ public class GameService implements IGameService{
 			}
 			List<Game> res = new ArrayList<>();
 			for (var g : _games.get()) {
-				if(g.getUser().getId() == userId) {
+				if(g.getUserId() == userId) {
 					res.add(g);
 				}
 			}
 			return new ResponseObject<List<Game>>("Lay danh sach lich thi dau thanh cong", res);
 		} catch (Exception e) {
-			return new ResponseObject<List<Game>>(
-					e.getMessage(),
-			        null
-			        );
+			return new ResponseObject<List<Game>>(e.getMessage(), null);
 		}
 	}
 	@Override
-	public ResponseObject<Object> createGame(Game game) {
+	public ResponseObject<Game> createGame(Game gameU) {
 		try {
-			Optional<Game> _game = Optional.of(gameRepo.findById(game.getId()));
+			Game g = new Game();
+			g.setId(gameU.getId());
+			g.setGameDay(gameU.getGameDay());
+			g.setGameDayTime(gameU.getGameDayTime());
+			g.setGameDayAdds(gameU.getGameDayAdds());
+			g.setPointRiderByGame(gameU.getPointRiderByGame());
+			Optional<Game> _game = Optional.ofNullable(gameRepo.findById(g.getId()));
 			if(_game.isPresent()) {
-				return new ResponseObject<Object>("Lich thi dau nay da ton tai", null);
+				return new ResponseObject<Game>("Lich thi dau nay da ton tai", null);
 			}
-			return new ResponseObject<Object>("Tao moi lich thi dau thanh cong", gameRepo.save(game));
+			Optional<Rider> _rider = Optional.ofNullable(riderRepo.findById(g.getRiderId()));
+			if(!_rider.isPresent()) {
+				return new ResponseObject<Game>("Tay dua khong ton tai", null);
+			}
+			
+			return new ResponseObject<Game>("Tao moi lich thi dau thanh cong", g);
 		} catch (Exception e) {
-			return new ResponseObject<Object>(
-					e.getMessage(),
-			        null
-			        );
+			return new ResponseObject<Game>(e.getMessage() + "Exception", null);
+		}
+	}
+	@Override
+	public ResponseObject<Game> updateById(int gameId, Game gameU) {
+		try {
+			Optional<Game> _game = Optional.ofNullable(gameRepo.findById(gameId));
+			if(!_game.isPresent()) {
+				return new ResponseObject<Game>("Lich thi dau khong ton tai!", null);
+			}
+			Optional<Rider> _rider = Optional.ofNullable(riderRepo.findById(gameU.getRiderId()));
+			if(!_rider.isPresent()) {
+				return new ResponseObject<Game>("Tay dua khong ton tai", null);
+			}
+			Game g = gameU;
+			return new ResponseObject<Game>("Cap nhat lich thi dau thanh cong", g);
+		} catch(Exception e) {
+			return new ResponseObject<Game>("Khong cap nhat thanh cong", null);
 		}
 	}
 	

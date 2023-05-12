@@ -16,7 +16,6 @@ import com.music.model.SeasonResult;
 import com.music.model.Team;
 import com.music.model.res.ResultSeasonRider;
 import com.music.model.res.ResultSeasonTeam;
-import com.music.model.res.ResultStageRider;
 import com.music.repository.GameRepo;
 import com.music.repository.RiderRepo;
 import com.music.repository.SeasonResultRepo;
@@ -41,13 +40,30 @@ public class SeasonResultService implements ISeasonResultService{
 		for (var s : _seasonResults.get()) {
 			if (s.getRaceStage().getId() == raceStageId) {
 				for (var g : _games.get()) {
-					if (g.getSeasonResult().getId() == s.getId()) {
+					if (g.getSeasonResultId() == s.getId()) {
 						res.add(s);
 					}
 				}
 			}
 		}
 		return res;
+	}
+	private List<ResultSeasonRider> solveResultSeasonRider(){
+		List<Rider> riders = riderRepo.findAll();
+		List<SeasonResult> seasonResults = seasonResultRepo.findAll();
+		List<Game> games = gameRepo.findAll();
+		List<ResultSeasonRider> lastRes = new ArrayList<>();
+		for (var s : seasonResults) {
+			for (var r : riders) {
+				for (var g : games) {
+					if (g.getRiderId() == r.getId() && g.getSeasonResultId() == s.getId()) {
+						int sum = r.getPointSeason() + g.getPointRiderByGame();
+						lastRes.add(new ResultSeasonRider(r, sum));
+					}
+				}
+			}
+		}
+		return lastRes;
 	}
 	private Boolean solveResultByRaceStageId(int raceStageId) {
 		try {
@@ -59,7 +75,6 @@ public class SeasonResultService implements ISeasonResultService{
 
 				@Override
 				public int compare(SeasonResult o1, SeasonResult o2) {
-					// TODO Auto-generated method stub
 					return Integer.compare(o1.getResultRankRider(), o2.getResultRankRider());
 				}
 					
@@ -82,14 +97,31 @@ public class SeasonResultService implements ISeasonResultService{
 	public ResponseObject<List<ResultSeasonTeam>> rankTeamBySeason() {
 		try {
 			Optional<List<Team>> _teams = Optional.of(teamRepo.findAll());
-			Optional<List<SeasonResult>> _seasonResults = Optional.of(seasonResultRepo.findAll());
-			Optional<List<Rider>> _riders = Optional.of(riderRepo.findAll());
-			List<SeasonResult> res = new ArrayList<>();
-			for ()
+			List<ResultSeasonRider> resRider = solveResultSeasonRider();
+			List<ResultSeasonTeam> resTeam = new ArrayList<>();
+			for (var t : _teams.get()) {
+				resTeam.add(new ResultSeasonTeam(t, 0));
+			}
+			for (var t : resTeam) {
+				for (var rr : resRider) {
+					if (rr.getRider().getTeam().getId() == t.getTeam().getId()) {
+						int sum = rr.getTotalPointSeason() + t.getPointTeam();
+						t.setPointTeam(sum);
+					}
+				}
+			}
+			Collections.sort(resTeam, new Comparator<ResultSeasonTeam>() {
+
+				@Override
+				public int compare(ResultSeasonTeam o1, ResultSeasonTeam o2) {
+					return Integer.compare(o1.getPointTeam(), o2.getPointTeam());
+				}
+				
+			});
+			return new ResponseObject<List<ResultSeasonTeam>>("Lay danh sach doi thanh cong", resTeam);
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<List<ResultSeasonTeam>>(e.getMessage(), null);
 		}
-		return null;
 	}
 
 	@Override
@@ -102,30 +134,23 @@ public class SeasonResultService implements ISeasonResultService{
 			}
 			return new ResponseObject<List<SeasonResult>>("Lay bang xep hang theo chang dua thanh cong", res);
 		} catch (Exception e) {
-			throw e;
+			return new ResponseObject<List<SeasonResult>>(e.getMessage(), null);
 		}
 	}
 
 	@Override
 	// ket qua theo mua giai, 
 	public ResponseObject<List<ResultSeasonRider>> rankRiderBySeason() {
-		List<Rider> riders = riderRepo.findAll();
-		List<SeasonResult> seasonResults = seasonResultRepo.findAll();
-		List<Game> games = gameRepo.findAll();
-		List<SeasonResult> lastRes = new ArrayList<>();
-		for (var s : seasonResults) {
-			for (var r : riders) {
-				for (var g : games) {
-					if (g.getRider().getId() == r.getId() && g.getSeasonResult().getId() == s.getId()) {
-						int sum = r.getPointSeason() + g.getPointRiderByGame();
-						r.setPointSeason(sum);
-						lastRes.add(s);
-					}
-				}
+		List<ResultSeasonRider> lastRes = solveResultSeasonRider();
+		Collections.sort(lastRes, new Comparator<ResultSeasonRider>() {
+
+			@Override
+			public int compare(ResultSeasonRider o1, ResultSeasonRider o2) {
+				return Integer.compare(o1.getTotalPointSeason(), o2.getTotalPointSeason());
 			}
-		}
-		Collections.sort();
-		
+			
+		});
+		return new ResponseObject<List<ResultSeasonRider>>("Lay danh sach thanh cong", lastRes);
 	}
 
 }

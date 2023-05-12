@@ -3,126 +3,114 @@ package com.music.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
 @Table(name ="game")
 public class Game {
-	@Id
-	@Column(name = "id", nullable = false)
-	private int id;
-	@Column(name = "gameDay", nullable = false)
-	private String gameDay;
-	@Column(name = "gameDayTime", nullable = false)
-	private String gameDayTime;
-	@Column(name = "gameDayAdds", nullable = false)
-	private String gameDayAdds;
-	@Column(name = "SeasonId", nullable = false)
-	private int seasonId;
-	@Column(name = "Riderid", nullable = false)
-	private int riderId;
-	@Column(name = "seasonResultid", nullable = false)
-	private int seasonResultId;
-	@Column(name = "Userid", nullable = false)
-	private int userId;
-	@Transient
-	private int pointRiderByG = 0;
-	@Transient
-	@ManyToOne
-	private Season season;
+    @Id
+    @Column(name = "id", nullable = false)
+    private int id;
+    @Column(name = "game_day", nullable = false)
+    private String gameDay;
+    @Column(name = "game_day_time", nullable = false)
+    private String gameDayTime;
+    @Column(name = "game_day_adds", nullable = false)
+    private String gameDayAdds;
+    @Column(name = "SeasonId", nullable = false)
+    private int seasonId;
+    @Column(name = "Riderid", nullable = false)
+    private int riderId;
+    @Column(name = "seasonResultid", nullable = false)
+    private int seasonResultId;
+    @Column(name = "Userid", nullable = false)
+    private int userId;
+    @Transient
+    private int pointRiderByGame = 0;
 
-	@Transient
-	private Rider rider;
+    public Game() {}
 
-	@Transient
-	private SeasonResult seasonResult;
+    public Game(int id, String gameDay, String gameDayTime, String gameDayAdds, int seasonId, int riderId, int seasonResultId, int userId, int pointRiderByGame) {
+        this.id = id;
+        this.gameDay = gameDay;
+        this.gameDayTime = gameDayTime;
+        this.gameDayAdds = gameDayAdds;
+        this.seasonId = seasonId;
+        this.riderId = riderId;
+        this.seasonResultId = seasonResultId;
+        this.userId = userId;
+        this.pointRiderByGame = pointRiderByGame;
+    }
 
-	@Transient
-	private User user;
+    public int getSeasonId() {
+        return seasonId;
+    }
 
-	public Game() {}
-	public Game(int id, String gameDay, String gameDayTime, String gameDayAdds, Season season, Rider rider, SeasonResult seasonResult, User user) {
-		this.id = id;
-		this.gameDay = gameDay;
-		this.gameDayTime = gameDayTime;
-		this.gameDayAdds = gameDayAdds;
-		this.season = season;
-		this.rider = rider;
-		this.seasonResult = seasonResult;
-		this.user = user;
-	}
+    public void setSeasonId(int seasonId) {
+        this.seasonId = seasonId;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public int getRiderId() {
+        return riderId;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setRiderId(int riderId) {
+        this.riderId = riderId;
+    }
 
-	public String getGameDay() {
-		return gameDay;
-	}
+    public int getSeasonResultId() {
+        return seasonResultId;
+    }
 
-	public void setGameDay(String gameDay) {
-		this.gameDay = gameDay;
-	}
+    public void setSeasonResultId(int seasonResultId) {
+        this.seasonResultId = seasonResultId;
+    }
 
-	public String getGameDayTime() {
-		return gameDayTime;
-	}
+    public int getUserId() {
+        return userId;
+    }
 
-	public void setGameDayTime(String gameDayTime) {
-		this.gameDayTime = gameDayTime;
-	}
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-	public String getGameDayAdds() {
-		return gameDayAdds;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setGameDayAdds(String gameDayAdds) {
-		this.gameDayAdds = gameDayAdds;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public Season getSeason() {
-		return season;
-	}
+    public String getGameDay() {
+        return gameDay;
+    }
 
-	public void setSeason(Season season) {
-		this.season = season;
-	}
+    public void setGameDay(String gameDay) {
+        this.gameDay = gameDay;
+    }
 
-	public Rider getRider() {
-		return rider;
-	}
+    public String getGameDayTime() {
+        return gameDayTime;
+    }
 
-	public void setRiders(Rider rider) {
-		this.rider = rider;
-	}
+    public void setGameDayTime(String gameDayTime) {
+        this.gameDayTime = gameDayTime;
+    }
 
-	public SeasonResult getSeasonResult() {
-		return seasonResult;
-	}
+    public String getGameDayAdds() {
+        return gameDayAdds;
+    }
 
-	public void setSeasonResult(SeasonResult seasonResult) {
-		this.seasonResult = seasonResult;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	public int getPointRiderByGame()
-	{
-		return this.pointRiderByG;
-	}
-	public void setPointRiderByGame(int point) {
-		this.pointRiderByG = point;
-	}
+    public void setGameDayAdds(String gameDayAdds) {
+        this.gameDayAdds = gameDayAdds;
+    }
+    public int getPointRiderByGame()
+    {
+        return this.pointRiderByGame;
+    }
+    public void setPointRiderByGame(int point) {
+        this.pointRiderByGame = point;
+    }
 }

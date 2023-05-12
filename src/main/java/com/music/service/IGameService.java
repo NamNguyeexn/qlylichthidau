@@ -8,7 +8,7 @@ import com.music.model.Game;
 
 public interface IGameService {
 	
-	ResponseObject<Object> createGame(Game game); 
+	ResponseObject<Game> createGame(Game game); 
 	
 	ResponseObject<Object> deleteById(int gameId);
 	
@@ -18,6 +18,7 @@ public interface IGameService {
 	
 	ResponseObject<Game> findBySeasonResultId (int seasonResultId);
 	
+	ResponseObject<Game> updateById(int gameId, Game gameU);
 //	ResponseObject<ArrayList<Game>> findBySeasonId (int seasonId);
 	
 	ResponseObject<List<Game>> findByUserId (int userId);
